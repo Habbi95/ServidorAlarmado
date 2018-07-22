@@ -16,7 +16,7 @@ import javax.websocket.server.ServerEndpoint;
 
 import com.google.gson.Gson;
 
-import logUtils.LogUtils;
+import logUtils.*;
 
 @ServerEndpoint("/actions")
 public class SimpleWebsocketServlet {
@@ -25,6 +25,7 @@ public class SimpleWebsocketServlet {
 	private static Session frontWS;
 	private static Gson gson;
 	
+	//TODO: implementar
 	private static int thresholdHIGH = -10;
 	private static int thresholdLOW = -10;
 	
