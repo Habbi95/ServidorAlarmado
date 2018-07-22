@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Simulador</title>
+<script type="text/javascript" src="lib/jquery-3.3.1.js"></script>
+<script type="text/javascript">
+	var uriWS = "ws://localhost:8080/AlarmadoServer/actions";
+	var miWebsocket = new WebSocket(uriWS);
+	
+	function getRandomInt(max) {
+		return Math.floor(Math.random() * Math.floor(max));
+	}
+	
+	function enviarDatos(){
+		var datosSim = {
+			"sensorNames" : ["Luz (lumens)" ,"Gases (ppp)"],
+			"values": [getRandomInt(50), getRandomInt(10000)],
+			"date": "",
+			"sensorID": "ID_" + getRandomInt(3).toString()
+		}
+		miWebsocket.send(JSON.stringify(datosSim));
+	}
+	
+	miWebsocket.onmessage = function(evento) {
+		var obj = JSON.parse(evento.data);
+		$("#valorRecibido").html(obj.value);
+		$("#IDSensor").html(obj.sensorID);
+	}
+	
+	window.onload = function() {
+		setInterval(enviarDatos, 1000);	
+	}
+</script>
+</head>
+<body>
+Enviando datos al servidor... <br>
+<table border="1">
+	<tr>
+		<td>Valor recibido: </td>
+		<td id="valorRecibido"></td>
+	</tr>
+	<tr>
+		<td>ID Sensor: </td>
+		<td id="IDSensor"></td>
+	</tr>
+</table>
+</body>
+</html>

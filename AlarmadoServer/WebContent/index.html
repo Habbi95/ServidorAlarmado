@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Test</title>
+<style type="text/css">
+.container {
+	width: 70%;
+	margin: 15px auto;
+}
+.boldFont {
+	color: black;
+	font-weight: bold;
+}
+</style>
+<script type="text/javascript" src="lib/jquery-3.3.1.js"></script>
+<script type="text/javascript" src="lib/Chart.js"></script>
+<script type="text/javascript" src="lib/utils.js"></script>
+<script type="text/javascript">
+ 	var uriWS = "ws://localhost:8080/AlarmadoServer/actions";
+    var miWebsocket = new WebSocket(uriWS); // Abrimos WebSocket
+    var colorNames = Object.keys(window.chartColors); // Tabla de colores
+    
+    var chartsMap = new Object(); // Gráfica de cada sensor
+	var chartsConfigMap = new Object(); // Configuracion de graficas asociadas a cada sensor
+    
+	
+	// Función encargada de devolver si hay un dataset en el chart creado con el nombre
+	// del sensor
+	function thereIsDatasetWith(sensorName, chartConfig) {		
+		for (var i = 0; i < chartConfig.data.datasets.length; i+=1) {
+			if(chartConfig.data.datasets[i].label == sensorName){
+				return chartConfig.data.datasets[i];
+			}
+		}
+		
+		return null;
+	}
+	
+	function hideAllCanvasExceptThis(selectedIndex){
+		var selectedID = selectedIndex.label;
+		$("#nodeIDinForm").attr('value', selectedID);
+		$("#contenedorCanvas").children('canvas').each(function () {
+			if($(this).attr('id') != 'chart_' + selectedID) $(this).attr('style', 'display: none');
+			else $(this).attr('style', 'display: true');
+		});
+		
+	}
+	
+	function updateThreshold(){
+		var sendData = {
+			"thresholdHIGH": $("#thresholdMax").attr('value'),
+			"thresholdLOW": $("#thresholdMin").attr('value')
+		}
+		miWebsocket.send(JSON.stringify(sendData));
+	}
+	
+	function sendMessageToNode(){
+		var sendData = {
+			"value": $("#sendDataToNodeSelect option:selected" ).text(),
+			"sensorID": $("#sensorGraph option:selected").attr('value')
+		}
+		miWebsocket.send(JSON.stringify(sendData));
+	}
+
+	miWebsocket.onopen = function(evento) {
+		miWebsocket.send("FRONT"); // Le indica al servidor que es quien muestra los datos
+	}
+	
+	
+	miWebsocket.onmessage = function(evento) {
+		console.log(evento.data);
+		var obj = JSON.parse(evento.data);
+		
+		// Seteamos el dato recibido en la tabla
+		$("#sensorName").html(obj.sensorNames.toString());
+		$("#value").html(obj.values.toString());
+		$("#date").html(obj.date);
+		$("#sensorID").attr('value', obj.sensorID.toString());
+		
+		// Comprobamos y añadimos nuevo sensor al select
+		if ($("#sensorGraph option[value='" + obj.sensorID.toString() + "']").length == 0){
+			$("#sensorGraph").append($("<option>").attr({
+				value: obj.sensorID.toString(),
+			}));
+			$("#sensorGraph option[value='" + obj.sensorID.toString() + "']").text(obj.sensorID.toString());
+			
+		}
+		if ($("#contenedorCanvas canvas[id='chart_" + obj.sensorID.toString() + "']").length == 0){
+			$("#contenedorCanvas").append($('<canvas>').attr({
+				id: 'chart_' + obj.sensorID.toString(),
+				style: 'display: none'
+			}));
+		}
+		
+		if(chartsConfigMap[obj.sensorID] == null)
+			// Seteamos a ese nodo 
+			chartsConfigMap[obj.sensorID] = {
+				type: 'line',
+				data: {
+					labels: [],
+					datasets: []
+				}
+			}
+		
+	    var ctx = document.getElementById('chart_' + obj.sensorID.toString()).getContext('2d'); // Obtenemos el contexto del canvas
+	    
+	    if(chartsMap[obj.sensorID] == null)
+			chartsMap[obj.sensorID] = new Chart(ctx, chartsConfigMap[obj.sensorID]);
+		// Por cada uno de los sensores,
+		// comprobamos si ya existe dataset en el chart
+		obj.sensorNames.forEach(function(sensor, indice, array) {
+			if(thereIsDatasetWith(sensor, chartsConfigMap[obj.sensorID]) != null){
+				if(thereIsDatasetWith(sensor, chartsConfigMap[obj.sensorID]).data.length >= $("#numPuntos").val())
+					thereIsDatasetWith(sensor, chartsConfigMap[obj.sensorID]).data.splice(0, thereIsDatasetWith(sensor, chartsConfigMap[obj.sensorID]).data.length 
+					   - $("#numPuntos").val() + 1); // Nos deshacemos del dato más antiguo
+					
+				thereIsDatasetWith(sensor, chartsConfigMap[obj.sensorID]).data.push(obj.values[indice]);	
+			} else { // Tenemos que crear uno nuevo
+				var colorName = colorNames[chartsConfigMap[obj.sensorID].data.datasets.length % colorNames.length];
+				var newColor = window.chartColors[colorName];
+				var newDataset = {
+					label: sensor,
+					backgroundColor: newColor,
+					borderColor: newColor,
+					data: [],
+					fill: false
+				};	
+				newDataset.data.push(obj.values[indice]); // Añadimso el dato del sensor
+				chartsConfigMap[obj.sensorID].data.datasets.push(newDataset); // Añadimos el dataset creado			
+			}	
+		
+		});
+		
+		if(chartsConfigMap[obj.sensorID].data.labels.length >= $("#numPuntos").val())
+			chartsConfigMap[obj.sensorID].data.labels.splice(0, chartsConfigMap[obj.sensorID].data.labels.length - $("#numPuntos").val() + 1);
+		
+		chartsConfigMap[obj.sensorID].data.labels.push(obj.date);
+		chartsMap[obj.sensorID].update();
+	
+	}
+</script>
+</head>
+<body>
+	<table style="table-layout:fixed" id="mainFrame">
+		<tr>
+			<td class="boldFont">Nombre del sensor:</td>
+			<td id="sensorName"></td>
+			<td class="boldFont">
+			    &emsp;ID sensor:
+				<input id="sensorID" type="text" value="" readonly/>
+			</td>
+			<td class="boldFont">&emsp;Enviar señal a nodo:</td>
+			<td rowspan="4">&emsp;&emsp;<img src="Imagenes/logoUMA.png" align="right" style="vertical-align: top;" height="50%"/></td>
+		</tr>
+		<tr>
+			<td class="boldFont">Tiempo:</td>
+			<td id="date"></td>
+			<td class="boldFont">
+			    &emsp;Nº de puntos: 
+				<input type="number" id="numPuntos" name="numPuntos" min="1" max="10" value="5">
+			</td>
+			<td>
+				&emsp;
+				<select id="sendDataToNodeSelect">
+			    	<option>ON</option>
+			    	<option>OFF</option>
+			    </select>
+				<button onclick="sendMessageToNode()">Enviar a nodo</button>
+			</td>
+		</tr>
+		<tr>
+			<td class="boldFont">Valor:</td>
+			<td id="value"></td>
+			<td></td>
+			<td class="boldFont">
+			    &emsp;Sensor: 
+				<select id="sensorGraph" name="sensorGraph" onchange="hideAllCanvasExceptThis(this[this.selectedIndex])">
+					<option value="" selected disabled>Seleccione el ID ...</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<br>
+				&emsp;Umbral mínimo: &nbsp;<input id="thresholdMin" type="number" min="0" value="0" onchange="updateThreshold()"><br>
+				&emsp;Umbral máximo: <input id="thresholdMax" type="number" min="0" value="0" onchange="updateThreshold()"><br>
+				&emsp;<b>*NOTA: </b> sólo aplica al sensor de temperatura</td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+	</table>
+	<div class="container" id="contenedorCanvas">
+		<canvas id="chart"></canvas> 
+	</div>
+</body>
+</html>
