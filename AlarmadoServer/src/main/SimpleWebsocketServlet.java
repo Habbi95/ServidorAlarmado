@@ -36,7 +36,7 @@ public class SimpleWebsocketServlet {
 	
 	@OnOpen
 	public void open(Session session) {
-		System.out.println("Conexión abierta con id " + session.getId());
+		System.out.println("Conexion abierta con id " + session.getId());
 		
 	}
 
@@ -45,7 +45,7 @@ public class SimpleWebsocketServlet {
 		for (Entry<String, Session> e : nodesID.entrySet()) 
 		    if(e.getValue() == session) nodesID.remove(e.getKey()); // Eliminamos el key a partir del value.
 		
-		System.out.println("Conexión cerrada con id " + session.getId());
+		System.out.println("Conexion cerrada con id " + session.getId());
 	}
 
 	@OnError
@@ -58,7 +58,7 @@ public class SimpleWebsocketServlet {
 	    try {
 	    	if(message.equals("FRONT")) frontWS = session;
 	    	else if(session == frontWS) {
-	    		// Si nos llega un mensaje del front, asumimos que es por el botón. 
+	    		// Si nos llega un mensaje del front, asumimos que es por el boton. 
 	    		// De este modo, parseamos el json y enviamos mensaje al nodo correspondiente via Websocket.
 	    		
 	    		AlarmNotificationJSON data = gson.fromJson(message, AlarmNotificationJSON.class);
@@ -67,7 +67,7 @@ public class SimpleWebsocketServlet {
 	    			 nodesID.get(data.sensorID).getBasicRemote().sendText(gson.toJson(data));
 	    			
 	    		} else {
-	    			// Si no viene informado es una actualización de los umbrales. O no se ha seleccionado nodo
+	    			// Si no viene informado es una actualizacion de los umbrales. O no se ha seleccionado nodo
 	    			thresholdHIGH = data.thresholdHIGH;
 	    			thresholdLOW = data.thresholdLOW;
 	    		}
@@ -89,8 +89,8 @@ public class SimpleWebsocketServlet {
 	    		
 	    		if(frontWS != null) frontWS.getBasicRemote().sendText(gson.toJson(data)); // Enviamos al frontal web los datos para mostrarlos
 	    		
-	    		// PROCESADO DE LOS DATOS -- Estableceremos una serie de reglas con umbrales para enviar mensajes automáticamente a los nodos.
-	    		// Sólamente para datos de temperatura
+	    		// PROCESADO DE LOS DATOS -- Estableceremos una serie de reglas con umbrales para enviar mensajes automaticamente a los nodos.
+	    		// Solamente para datos de temperatura
 	    	}
 	    } catch (Exception e) {
 	    	LogUtils.escribirExcepcion("Ha ocurrido un error en el OnMessage del Websocket", e);

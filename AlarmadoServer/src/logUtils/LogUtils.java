@@ -8,18 +8,19 @@ import java.util.Date;
 
 public class LogUtils {
     
-	private static String filePath = "/Users/Javi/Desktop/Logs/";
+	//private static String filePathMac = "/Users/Javi/Desktop/Logs/";
+	private static String filePathWindows = "C:\\Logs\\";
 	private static FileWriter fileWriter;
 	private static FileWriter fileWriterCSV;
     
 	static {
-		File fichero = new File(filePath + "csv_" + getActualTime()[1] + ".csv");
+		File fichero = new File(filePathWindows + "csv_" + getActualTime()[1] + ".csv");
 		if (!fichero.exists()) {
 			try {
 				
 				fichero.createNewFile();
-				// Introducimos la cabecera sólo una vez
-				fileWriterCSV = new FileWriter(filePath + "csv_" + getActualTime()[1] + ".csv", true);
+				// Introducimos la cabecera solo una vez
+				fileWriterCSV = new FileWriter(filePathWindows + "csv_" + getActualTime()[1] + ".csv", true);
 				fileWriterCSV.append("ID Nodo");
 				fileWriterCSV.append(",");
 				fileWriterCSV.append("Sensor");
@@ -56,7 +57,7 @@ public class LogUtils {
     
 	public static void escribirCSV(String nodo, String sensor, String valor) {
 		try {
-			fileWriterCSV = new FileWriter(filePath + "csv_" + getActualTime()[1] + ".csv", true);
+			fileWriterCSV = new FileWriter(filePathWindows + "csv_" + getActualTime()[1] + ".csv", true);
 			
 			fileWriterCSV.append(nodo);
 			fileWriterCSV.append(",");
@@ -82,10 +83,10 @@ public class LogUtils {
 	public static void escribirLog(String mensaje) {
 
 		try {
-			File fichero = new File(filePath + "log_" + getActualTime()[1] + ".txt");
+			File fichero = new File(filePathWindows + "log_" + getActualTime()[1] + ".txt");
 			if (!fichero.exists()) fichero.createNewFile();
 
-			fileWriter = new FileWriter(filePath + "log_" + getActualTime()[1] + ".txt", true);
+			fileWriter = new FileWriter(filePathWindows + "log_" + getActualTime()[1] + ".txt", true);
 			fileWriter.write("[" + getActualTime()[0] + "] : INFO : " + mensaje + "\n");
 
 		} catch (IOException e) {
@@ -103,10 +104,10 @@ public class LogUtils {
 	public static void escribirExcepcion(String mensaje, Exception exc) {
 		
 		try {
-			File fichero = new File(filePath + "log_" + getActualTime()[1] + ".txt");
+			File fichero = new File(filePathWindows + "log_" + getActualTime()[1] + ".txt");
 			if (!fichero.exists()) fichero.createNewFile();
 
-			fileWriter = new FileWriter(filePath + "log_" + getActualTime()[1] + ".txt", true);
+			fileWriter = new FileWriter(filePathWindows + "log_" + getActualTime()[1] + ".txt", true);
 			fileWriter.write("[" + getActualTime()[0] + "] : ERROR : " + mensaje + "\n");
 			fileWriter.write("\t\t" + exc.getMessage() + "\n");
 
