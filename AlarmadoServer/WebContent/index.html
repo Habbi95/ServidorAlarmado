@@ -24,8 +24,7 @@
     
     var chartsMap = new Object(); // Gráfica de cada sensor
 	var chartsConfigMap = new Object(); // Configuracion de graficas asociadas a cada sensor
-    
-	
+    	
 	// Función encargada de devolver si hay un dataset en el chart creado con el nombre
 	// del sensor
 	function thereIsDatasetWith(sensorName, chartConfig) {		
@@ -50,8 +49,8 @@
 	
 	function updateThreshold(){
 		var sendData = {
-			"thresholdHIGH": $("#thresholdMax").attr('value'),
-			"thresholdLOW": $("#thresholdMin").attr('value')
+			"thresholdHIGH": $("#thresholdMax").val(),
+			"thresholdLOW": $("#thresholdMin").val()
 		}
 		miWebsocket.send(JSON.stringify(sendData));
 	}
@@ -79,6 +78,10 @@
 		$("#date").html(obj.date);
 		$("#sensorID").attr('value', obj.sensorID.toString());
 		
+		// Obtenemos info relacionada con el alarmado
+		if(obj.alarmInfo != undefined && obj.alarmInfo != "")
+			$("#alarmInfo").val($("#alarmInfo").val() + '\n' + obj.alarmInfo);
+			
 		// Comprobamos y añadimos nuevo sensor al select
 		if ($("#sensorGraph option[value='" + obj.sensorID.toString() + "']").length == 0){
 			$("#sensorGraph").append($("<option>").attr({
@@ -102,9 +105,18 @@
 				data: {
 					labels: [],
 					datasets: []
-				}
+				},
+				options: {
+			        scales: {
+			            yAxes: [{
+			                ticks: {
+			                    beginAtZero: true,
+			                    suggestedMax: 60
+			                }
+			            }]
+			        }
 			}
-		
+		}
 	    var ctx = document.getElementById('chart_' + obj.sensorID.toString()).getContext('2d'); // Obtenemos el contexto del canvas
 	    
 	    if(chartsMap[obj.sensorID] == null)
@@ -147,7 +159,7 @@
 	<table style="table-layout:fixed" id="mainFrame">
 		<tr>
 			<td class="boldFont">Nombre del sensor:</td>
-			<td id="sensorName"></td>
+			<td style="width: 210px; overflow: hidden; display: inline-block; white-space: nowrap; text-overflow: ellipsis;" id="sensorName"></td>
 			<td class="boldFont">
 			    &emsp;ID sensor:
 				<input id="sensorID" type="text" value="" readonly/>
@@ -185,10 +197,12 @@
 		<tr>
 			<td>
 				<br>
-				&emsp;Umbral mínimo: &nbsp;<input id="thresholdMin" type="number" min="0" value="0" onchange="updateThreshold()"><br>
-				&emsp;Umbral máximo: <input id="thresholdMax" type="number" min="0" value="0" onchange="updateThreshold()"><br>
+				&emsp;Umbral mínimo: &nbsp;<input id="thresholdMin" name="thresholdMin" type="number" min="0" value="0" onchange="updateThreshold()"><br>
+				&emsp;Umbral máximo: <input id="thresholdMax" name="thresholdMax" type="number" min="0" value="0" onchange="updateThreshold()"><br>
 				&emsp;<b>*NOTA: </b> sólo aplica al sensor de temperatura</td>
-			<td></td>
+			<td colspan="3">
+				&emsp;<textarea rows="5" cols="90" id="alarmInfo"></textarea>
+			</td>
 			<td></td>
 			<td></td>
 		</tr>

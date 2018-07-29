@@ -5,4 +5,5 @@ public class SensorDataJSON {
 	public int [] values;
 	public String sensorID;
 	public String date;
+	public String alarmInfo;
 }

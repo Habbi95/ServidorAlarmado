@@ -14,10 +14,9 @@
 	
 	function enviarDatos(){
 		var datosSim = {
-			"sensorNames" : ["Luz (lumens)" ,"Gases (ppp)"],
-			"values": [getRandomInt(50), getRandomInt(10000)],
-			"date": "",
-			"sensorID": "ID_" + getRandomInt(3).toString()
+			"sensorNames" : ["Luz (lumens)" ,"Gases (ppp)", "Temperatura (%)"],
+			"values": [getRandomInt(50), getRandomInt(10000), getRandomInt(40)],
+			"sensorID": "ID_0"
 		}
 		miWebsocket.send(JSON.stringify(datosSim));
 	}
@@ -29,7 +28,7 @@
 	}
 	
 	window.onload = function() {
-		setInterval(enviarDatos, 1000);	
+		setInterval(enviarDatos, 3000);	
 	}
 </script>
 </head>
