@@ -28,6 +28,7 @@ public class SimpleWebsocketServlet {
 	private static Session frontWS;
 	private static Gson gson;
 	
+	private static String SENSOR_TOKEN_TO_ALARM = "Pot";
 	private static int thresholdHIGH = Integer.MAX_VALUE;
 	private static int thresholdLOW = Integer.MIN_VALUE;
 	private static int numOcurs = 5;
@@ -72,7 +73,7 @@ public class SimpleWebsocketServlet {
 	@OnMessage
 	public void handleMessage(String message, Session session) {
 		
-		int containTempSensorIndex = -10; /* El alarmado sólo aplica para el sensor de temperatura de cada nodo.
+		int containAlarmSensorIndex = -10; /* El alarmado sólo aplica para el sensor de temperatura de cada nodo.
 										     Esta variable guarda la posición del array de sensorNames del JSON donde se encuentra el sensor
 									         de temperatura*/
 		                  
@@ -113,15 +114,15 @@ public class SimpleWebsocketServlet {
 	    		System.out.println("Mensaje recibido (id: " + session.getId() + "): " + message);
 	    		
 	    		for (int i = 0; i < data.sensorNames.length; i++) {
-	    			if(data.sensorNames[i].startsWith("Temp")) containTempSensorIndex = i;
+	    			if(data.sensorNames[i].startsWith(SENSOR_TOKEN_TO_ALARM)) containAlarmSensorIndex = i;
 	    			LogUtils.escribirLog("ID Nodo: " + data.sensorID + "\tValor bruto recogido del sensor " + data.sensorNames[i] + ": " + data.values[i]);
 	    			LogUtils.escribirCSV(data.sensorID, data.sensorNames[i], String.valueOf(data.values[i]));
 	    		}
 	    		
 	    		
 	    		// PROCESADO DE LOS DATOS -- Estableceremos una serie de reglas con umbrales para enviar mensajes automaticamente a los nodos.
-	    		if (alarmActive.get(data.sensorID) && containTempSensorIndex != -10) {
-	    			if(data.values[containTempSensorIndex] >= thresholdHIGH) {
+	    		if (alarmActive.get(data.sensorID) && containAlarmSensorIndex != -10) {
+	    			if(data.values[containAlarmSensorIndex] >= thresholdHIGH) {
 	    				int counter = alarmCounter.get(data.sensorID);
 	    				counter = counter + 1;
 	    				alarmCounter.put(data.sensorID, counter);
@@ -141,7 +142,7 @@ public class SimpleWebsocketServlet {
 	    				alarmActive.put(data.sensorID, false); // Desactivamos hasta que pase al umbral mínimo
 	    				alarmCounter.put(data.sensorID, 0); // Reseteamos el contador del nodo
 	    			}
-	    		} else if(containTempSensorIndex != -10 && data.values[containTempSensorIndex] <= thresholdLOW){
+	    		} else if(containAlarmSensorIndex != -10 && data.values[containAlarmSensorIndex] <= thresholdLOW){
 	    			// Si entramos aquí es porque el alarmado se ha desactivado. Esperamos hasta que pase al umbral mínimo
 	    			sendAlarmToNode(data.sensorID, "OFF"); // Apagamos el actuador
 	    			LogUtils.escribirLog("ID Nodo: " + data.sensorID + "\tALARMADO: Se reactiva el alarmado y se envía OFF para el nodo " + data.sensorID + ". Umbral mínimo alcanzado: " + thresholdLOW);
