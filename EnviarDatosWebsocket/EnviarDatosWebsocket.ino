@@ -109,7 +109,7 @@ void loop() {
   temp = dht.readTemperature();
   hum = dht.readHumidity();
   
-  sensorNames.add("Temperatura (%)");
+  sensorNames.add("Temperatura (°C)");
   values.add(temp);
   
   Serial.print("Temperature: ");
