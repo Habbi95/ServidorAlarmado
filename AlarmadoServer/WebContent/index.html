@@ -36,7 +36,7 @@
 		
 		return null;
 	}
-	
+
 	function hideAllCanvasExceptThis(selectedIndex){
 		var selectedID = selectedIndex.label;
 		$("#nodeIDinForm").attr('value', selectedID);
@@ -48,11 +48,17 @@
 	}
 	
 	function updateThreshold(){
-		var sendData = {
-			"thresholdHIGH": $("#thresholdMax").val(),
-			"thresholdLOW": $("#thresholdMin").val()
+		if (parseInt($("#thresholdMin").val()) > parseInt($("#thresholdMax").val())){
+			alert("El umbral inferior no puede ser mayor o igual que el umbral superior");
+			$("#thresholdMin").val(0);  
+		} else{
+			var sendData = {
+				"thresholdHIGH": $("#thresholdMax").val(),
+				"thresholdLOW": $("#thresholdMin").val(),
+				"sensorToAlarm": $("#sensorToAlarm").val() 
+			}
+			miWebsocket.send(JSON.stringify(sendData));
 		}
-		miWebsocket.send(JSON.stringify(sendData));
 	}
 	
 	function sendMessageToNode(){
@@ -62,7 +68,7 @@
 		}
 		miWebsocket.send(JSON.stringify(sendData));
 	}
-
+    
 	miWebsocket.onopen = function(evento) {
 		miWebsocket.send("FRONT"); // Le indica al servidor que es quien muestra los datos
 	}
@@ -79,8 +85,10 @@
 		$("#sensorID").attr('value', obj.sensorID.toString());
 		
 		// Obtenemos info relacionada con el alarmado
-		if(obj.alarmInfo != undefined && obj.alarmInfo != "")
+		if(obj.alarmInfo != undefined && obj.alarmInfo != ""){
 			$("#alarmInfo").val($("#alarmInfo").val() + '\n' + obj.alarmInfo);
+			$("#alarmInfo").scrollTop($("#alarmInfo")[0].scrollHeight);	
+		}
 			
 		// Comprobamos y añadimos nuevo sensor al select
 		if ($("#sensorGraph option[value='" + obj.sensorID.toString() + "']").length == 0){
@@ -197,11 +205,12 @@
 		<tr>
 			<td>
 				<br>
-				&emsp;Umbral mínimo: &nbsp;<input id="thresholdMin" name="thresholdMin" type="number" min="0" value="0" onchange="updateThreshold()"><br>
-				&emsp;Umbral máximo: <input id="thresholdMax" name="thresholdMax" type="number" min="0" value="0" onchange="updateThreshold()"><br>
-				&emsp;<b>*NOTA: </b> sólo aplica al sensor de temperatura</td>
+				Umbral mínimo: &nbsp;<input id="thresholdMin" name="thresholdMin" type="number" min="0" value="0" onchange="updateThreshold()">&emsp;<br>
+				Umbral máximo: <input id="thresholdMax" name="thresholdMax" type="number" min="0" value="0" onchange="updateThreshold()">&emsp;<br>
+				<b>*NOTA: </b> sólo aplica al sensor de temperatura &emsp;<br><br>
+				<b>Sensor alarmado: </b><input id="sensorToAlarm" type="text" onchange="updateThreshold()" value="Temperatura">&emsp;</td>
 			<td colspan="3">
-				&emsp;<textarea rows="5" cols="90" id="alarmInfo"></textarea>
+				&emsp;<textarea rows="5" cols="90" id="alarmInfo" readonly></textarea>
 			</td>
 			<td></td>
 			<td></td>

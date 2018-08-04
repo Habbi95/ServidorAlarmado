@@ -5,4 +5,5 @@ public class AlarmNotificationJSON {
 	public String value;
 	public int thresholdHIGH;
 	public int thresholdLOW;
+	public String sensorToAlarm;
 }

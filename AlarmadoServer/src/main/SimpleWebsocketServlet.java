@@ -28,7 +28,7 @@ public class SimpleWebsocketServlet {
 	private static Session frontWS;
 	private static Gson gson;
 	
-	private static String SENSOR_TOKEN_TO_ALARM = "Pot";
+	private static String SENSOR_TOKEN_TO_ALARM = "-10";
 	private static int thresholdHIGH = Integer.MAX_VALUE;
 	private static int thresholdLOW = Integer.MIN_VALUE;
 	private static int numOcurs = 5;
@@ -90,10 +90,11 @@ public class SimpleWebsocketServlet {
 	    			sendAlarmToNode(data.sensorID, data.value);
 	    			
 	    		} else {
-	    			// Si no viene informado es una actualizacion de los umbrales. O no se ha seleccionado nodo, lo cual
-	    			// es irrelevante
+	    			// Si no viene informado es una actualizacion de los umbrales y del sensor a tener en cuenta para
+	    			// el alarmado. O no se ha seleccionado nodo, lo cual es irrelevante
 	    			thresholdHIGH = data.thresholdHIGH;
 	    			thresholdLOW = data.thresholdLOW;
+	    			SENSOR_TOKEN_TO_ALARM = data.sensorToAlarm;
 	    		}
 	    		
 	    	} else {
