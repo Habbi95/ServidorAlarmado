@@ -44,7 +44,7 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
     case WStype_TEXT:
       Serial.printf("[WSc] get text: %s\n", payload);
       
-      // Parseando json
+      // Parseando json para encender el LED
       JsonObject& root_ev = jsonBuffer.parseObject(payload);
       if (!root_ev.success()) {
           Serial.println("parseObject() failed");
