@@ -20,7 +20,7 @@ const char* host = "192.168.0.154";
 #define LEDPIN D8
 
 StaticJsonBuffer<300> jb;
-StaticJsonBuffer<200> jb_event;
+StaticJsonBuffer<200> jb_ev;
 
 WebSocketsClient webSocket;
 ESP8266WiFiMulti wifiMulti;
@@ -42,19 +42,24 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
       
       break;
     case WStype_TEXT:
+    {
       Serial.printf("[WSc] get text: %s\n", payload);
       
       // Parseando json para encender el LED
-      JsonObject& root_ev = jb_event.parseObject(payload);
+      JsonObject& root_ev = jb_ev.parseObject((char *)payload);
+     
       if (!root_ev.success()) {
           Serial.println("parseObject() failed");
           break;
       }
-      String value = root["value"];
-      if (value.equals("ON")) digitalWrite(LEDPIN, HIGH);
-      else if(value.equals("OFF")) digitalWrite(LEDPIN, LOW);
-
-
+      
+      const char* value = root_ev["value"];
+      String str_val(value);
+      if (str_val.equals("ON")) digitalWrite(LEDPIN, HIGH);
+      else if(str_val.equals("OFF")) digitalWrite(LEDPIN, LOW);
+      
+      jb_ev.clear();
+    }
       break;
     case WStype_BIN:
       Serial.printf("[WSc] get binary length: %u\n", length);
@@ -142,7 +147,7 @@ void loop() {
   values.add(pot);
 
   Serial.print("Potenciometro: ");
-  Serial.print(pot);
+  Serial.println(pot);
 
   // Enviamos el JSON con los sensores
   root.printTo(output);
