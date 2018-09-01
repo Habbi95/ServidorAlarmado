@@ -86,9 +86,6 @@ void setup() {
   // event handler
   webSocket.onEvent(webSocketEvent);
 
-  // use HTTP Basic Authorization this is optional remove if not needed
-  //webSocket.setAuthorization("user", "Password");
-
   // try ever 5000 again if connection has failed
   webSocket.setReconnectInterval(5000);
 
@@ -102,14 +99,14 @@ void loop() {
   JsonObject& root = jb.createObject();
   
   root["sensorID"] = "ID_" + (String) WiFi.localIP();
-  root["date"] = ""; // El servidor se encargará de introducir la hora
+  root["date"] = ""; // El servidor se encarga de introducir la hora
   JsonArray& sensorNames = root.createNestedArray("sensorNames");
   JsonArray& values = root.createNestedArray("values");
   
   temp = dht.readTemperature();
   hum = dht.readHumidity();
   
-  sensorNames.add("Temperatura (°C)");
+  sensorNames.add("Temperatura (�C)");
   values.add(temp);
   
   Serial.print("Temperature: ");
