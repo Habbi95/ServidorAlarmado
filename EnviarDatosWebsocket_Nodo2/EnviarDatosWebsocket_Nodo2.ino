@@ -17,8 +17,10 @@ const char* host = "192.168.0.154";
 
 #define USE_SERIAL Serial
 #define DHTPIN D0
+#define LEDPIN D8
 
 StaticJsonBuffer<300> jb;
+StaticJsonBuffer<200> jb_event;
 
 WebSocketsClient webSocket;
 ESP8266WiFiMulti wifiMulti;
@@ -42,6 +44,17 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
     case WStype_TEXT:
       Serial.printf("[WSc] get text: %s\n", payload);
       
+      // Parseando json
+      JsonObject& root_ev = jsonBuffer.parseObject(payload);
+      if (!root_ev.success()) {
+          Serial.println("parseObject() failed");
+          break;
+      }
+      String value = root["value"];
+      if (value.equals("ON")) digitalWrite(LEDPIN, HIGH);
+      else if(value.equals("OFF")) digitalWrite(LEDPIN, LOW);
+
+
       break;
     case WStype_BIN:
       Serial.printf("[WSc] get binary length: %u\n", length);
@@ -60,6 +73,9 @@ void setup() {
   Serial.println();
   Serial.println();
   Serial.println();
+
+  // Pin del led
+  pinMode(LEDPIN, OUTPUT);
 
   wifiMulti.addAP(ssid, password);
   
