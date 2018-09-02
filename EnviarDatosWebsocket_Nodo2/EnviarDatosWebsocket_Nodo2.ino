@@ -1,15 +1,7 @@
 #include "DHT.h"
-
 #include <ArduinoJson.h>
-
-#include "WebSockets.h"
 #include "WebSocketsClient.h"
-#include "WebSocketsServer.h"
-
-#include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
-
-const size_t bufferSize = JSON_ARRAY_SIZE(2) + JSON_OBJECT_SIZE(3);
 
 const char* ssid     = "vodafoneF7B4";
 const char* password = "5HJPMJTBJ3Q5UX";
