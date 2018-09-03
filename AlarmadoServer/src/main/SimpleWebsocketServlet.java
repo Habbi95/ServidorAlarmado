@@ -33,13 +33,14 @@ public class SimpleWebsocketServlet {
 	private static int thresholdLOW = Integer.MIN_VALUE;
 	private static int numOcurs = 5;
 	
-	void sendAlarmToNode(String node, String message) throws IOException{
+	private void sendAlarmToNode(String node, String message) throws IOException{
 		AlarmNotificationJSON data = new AlarmNotificationJSON();
 		data.sensorID = node;
 		data.value = message;
 		
 		nodesID.get(node).getBasicRemote().sendText(gson.toJson(data));
 	}
+	
 	public SimpleWebsocketServlet() {
 		nodesID = Collections.synchronizedMap(new HashMap<String, Session>());
 		alarmCounter = Collections.synchronizedMap(new HashMap<String, Integer>());
