@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>9</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>54</x>
+      <y>27</y>
+      <w>333</w>
+      <h>279</h>
+    </coordinates>
+    <panel_attributes>main::SimpleWebsocketServlet
+--
+-nodesID: Map&lt;String, Session&gt;
+-alarmCounter: Map&lt;String, Integer&gt;
+-alarmActive: Map&lt;String, Boolean&gt;
+-frontWS: Session
+-gson: Gson
+-SENSOR_TOKEN_TO_ALARM = "-10": String
+-thresholdHIGH = Integer.MAX_VALUE: int
+-thresholdLOW = Integer.MIN_VALUE: int
+-numOcurs = 5: int
+--
++SimpleWebsocketServlet(): ctor
+-sendAlarmToNode(String node, String message): void
++open(Session session): void
++close(Session session): void
++onError(Throwable error): void
++handleMessage(String message, Session session): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>450</x>
+      <y>63</y>
+      <w>342</w>
+      <h>162</h>
+    </coordinates>
+    <panel_attributes>logUtils::LogUtils
+--
+-filePathWindows = "C:\\Logs\\": String
+-fileWriter: FileWriter
+-fileWriterCSV: FileWriter
+--
+-getActualTime(): String[]
++escribirCSV(String nodo, String sensor, String valor): void
++escribirLog(String mensaje): void
++escribirExcepcion(String mensaje, Exception exc): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>117</x>
+      <y>360</y>
+      <w>180</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>main::AlarmNotificationJSON
+--
++sensorID: String
++value: String
++thresholdHIGH: int
++thresholdLOW: int
++sensorToAlarm: String
+--
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>540</x>
+      <y>279</y>
+      <w>153</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>main::SensorDataJSON
+--
++sensorNames: String[]
++values: int[]
++sensorID: String
++date: String
++alarmInfo: String
+--
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>198</x>
+      <y>297</y>
+      <w>27</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>378</x>
+      <y>126</y>
+      <w>90</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>80.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>378</x>
+      <y>243</y>
+      <w>180</w>
+      <h>117</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>180.0;110.0;10.0;10.0</additional_attributes>
+  </element>
+</diagram>
