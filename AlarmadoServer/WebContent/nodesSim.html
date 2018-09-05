@@ -7,7 +7,7 @@
 <script type="text/javascript">
 	var uriWS = "ws://localhost:8080/AlarmadoServer/actions";
 	var miWebsocket = new WebSocket(uriWS);
-	
+	var randomNode = getRandomInt(50);
 	function getRandomInt(max) {
 		return Math.floor(Math.random() * Math.floor(max));
 	}
@@ -16,7 +16,7 @@
 		var datosSim = {
 			"sensorNames" : ["Luz (lumens)" ,"Gases (ppp)", "Temperatura (ºC)"],
 			"values": [getRandomInt(50), getRandomInt(10000), getRandomInt(40)],
-			"sensorID": "ID_0"
+			"sensorID": "ID_" + randomNode
 		}
 		miWebsocket.send(JSON.stringify(datosSim));
 	}
