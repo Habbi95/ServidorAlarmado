@@ -28,6 +28,8 @@ public class LogUtils {
 				fileWriterCSV.append("Valor");
 				fileWriterCSV.append(",");
 				fileWriterCSV.append("Fecha");
+				fileWriterCSV.append(",");
+				fileWriterCSV.append("Hora");
 				fileWriterCSV.append("\n");
 
 			} catch (IOException e) {
@@ -43,14 +45,21 @@ public class LogUtils {
 		}
 	}
 	
+	/**
+	 *
+	 * @return Array de String con fecha, hora y ambos
+	 */
 	private static String[] getActualTime() {
-		String tiempo[] = { "", "" };
+		String tiempo[] = { "", "", "" };
 		Date ahora = new Date();
 		SimpleDateFormat formateador = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 		tiempo[0] = formateador.format(ahora).toString();
 
 		formateador = new SimpleDateFormat("dd-MM-yyyy");
 		tiempo[1] = formateador.format(ahora).toString();
+		
+		formateador = new SimpleDateFormat("HH:mm:ss");
+		tiempo[2] = formateador.format(ahora).toString();
 
 		return tiempo;
 	}
@@ -65,7 +74,9 @@ public class LogUtils {
 			fileWriterCSV.append(",");
 			fileWriterCSV.append(valor);
 			fileWriterCSV.append(",");
-			fileWriterCSV.append(getActualTime()[0]);
+			fileWriterCSV.append(getActualTime()[1]);
+			fileWriterCSV.append(",");
+			fileWriterCSV.append(getActualTime()[2]);
 			fileWriterCSV.append("\n");
 
 		} catch (IOException e) {
