@@ -113,17 +113,7 @@
 				data: {
 					labels: [],
 					datasets: []
-				},
-				options: {
-			        scales: {
-			            yAxes: [{
-			                ticks: {
-			                    beginAtZero: true,
-			                    suggestedMax: 60
-			                }
-			            }]
-			        }
-			}
+				}
 		}
 	    var ctx = document.getElementById('chart_' + obj.sensorID.toString()).getContext('2d'); // Obtenemos el contexto del canvas
 	    
@@ -180,7 +170,7 @@
 			<td id="date"></td>
 			<td class="boldFont">
 			    &emsp;Nº de puntos: 
-				<input type="number" id="numPuntos" name="numPuntos" min="1" max="10" value="5">
+				<input type="number" id="numPuntos" name="numPuntos" min="1" max="15" value="5">
 			</td>
 			<td>
 				&emsp;
